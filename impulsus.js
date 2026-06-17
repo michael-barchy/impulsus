@@ -10,10 +10,42 @@
     Impulsus.bind = function() {
         var sections = document.querySelectorAll('section');
         sections.forEach(function(section) {
+            if ('false' === section.dataset.impulsus) {
+                return;
+            }
             if (section.dataset.src) {
-                Impulsus.xhr(section.dataset.src, function(r) {
-                   section.innerHTML = r;
+                Impulsus.load(section, section.dataset.src);
+            }
+            var links = section.querySelectorAll('a');
+            links.forEach(function(link) {
+                link.addEventListener('click', function(event) {
+                    var target = null;
+                    if (link.dataset.target) {
+                        target = document.querySelector(link.dataset.target);
+                    }
+                    if (null === target) {
+                        target = section;
+                    }
+                    Impulsus.load(target, link.href);
+                    event.preventDefault();
+                    event.stopPropagation();
                 });
+            });
+        });
+    }
+    
+    /**
+     * 
+     * @param {Element} section 
+     * @param {string} url 
+     */
+    Impulsus.load = function(section, url) {
+        section.setAttribute('data-loading', 'true');
+        Impulsus.xhr(url, function(r) {
+            section.innerHTML = r;
+            section.removeAttribute('data-loading');
+            if (!section.hasAttribute('data-src')) {
+                section.setAttribute('data-src', url);
             }
         });
     }

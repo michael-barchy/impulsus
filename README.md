@@ -50,3 +50,18 @@ git submodule update --remote
 ```html
 <section data-src="hello.html"></section>
 ```
+
+### Links
+```html
+<section>
+    <a href="hello.html">Click to show message</a>
+</section>
+```
+
+```html
+<section>
+    <a href="hello.html" data-target="#below">Click to show message below</a>
+</section>
+<section id="below">
+</section>
+```
