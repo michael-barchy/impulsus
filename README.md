@@ -22,3 +22,24 @@ git submodule add https://github.com/michael-barchy/impulsus
 ```shell
 git submodule update --remote
 ```
+
+## Usage
+
+### Loading using npm
+
+```html
+<html>
+    <head>
+        <script src="node_modules/impulsus/impulsus.js"></script>
+    </head>
+</html>
+```
+
+### Loading without npm
+```html
+<html>
+    <head>
+        <script src="impulsus/impulsus.js"></script>
+    </head>
+</html>
+```

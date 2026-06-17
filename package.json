@@ -1,3 +1,6 @@
 {
-    "name": "impulsus"
+    "name": "impulsus",
+    "files": [
+        "impulsus.js"
+    ]
 }
