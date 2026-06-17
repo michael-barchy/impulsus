@@ -46,6 +46,14 @@ git submodule update --remote
 
 ## Using the library
 
+Dynamically loaded sections can be loaded from full content, section or section with matching id.
+
+```html
+<section>Hello</section>
+<!-- This code is ignored -->
+```
+
+
 ### Sections
 ```html
 <section data-src="hello.html"></section>
