@@ -41,25 +41,30 @@
      */
     Impulsus.load = function(section, url) {
         section.setAttribute('data-loading', 'true');
-        Impulsus.xhr(url, function(r) {
-            var div = document.createElement('div');
-            div.innerHTML = r;
-            var result = null;
-            if (section.id) {
-                result = div.querySelector('section#' + section.id);
-            }
-            if (null === result) {
-                result = div.querySelector('section');
-            }
-            if (null === result) {
-                result = div;
-            }
-            section.innerHTML = result.innerHTML;
-            section.removeAttribute('data-loading');
-            if (!section.hasAttribute('data-src')) {
-                section.setAttribute('data-src', url);
-            }
-        });
+        var dataDelay = section.getAttribute('data-delay');
+        var delay = dataDelay ? parseInt(dataDelay) : 0;
+        setTimeout(function() {
+            Impulsus.xhr(url, function(r) {
+                var div = document.createElement('div');
+                div.innerHTML = r;
+                var result = null;
+                if (section.id) {
+                    result = div.querySelector('section#' + section.id);
+                }
+                if (null === result) {
+                    result = div.querySelector('section');
+                }
+                if (null === result) {
+                    result = div;
+                }
+                section.innerHTML = result.innerHTML;
+                section.removeAttribute('data-loading');
+                section.removeAttribute('data-delay');
+                if (!section.hasAttribute('data-src')) {
+                    section.setAttribute('data-src', url);
+                }
+            });
+        }, delay);
     }
     
     /**
