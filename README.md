@@ -43,3 +43,10 @@ git submodule update --remote
     </head>
 </html>
 ```
+
+## Using the library
+
+### Sections
+```html
+<section data-src="hello.html"></section>
+```

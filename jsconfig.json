@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "module": "none",
+    "target": "es5",
+    "checkJs": true
+  }
+}
