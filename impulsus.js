@@ -1,24 +1,42 @@
-(function() {
+(function () {
 
     function Impulsus() {
     }
-    
-    Impulsus.init = function() {
+
+    /**
+     * @param {*} global 
+     */
+    Impulsus.init = function (global) {
+        this.exports(global);
         this.bind();
     };
-    
-    Impulsus.bind = function() {
-        var sections = document.querySelectorAll('section');
-        sections.forEach(function(section) {
+
+    /**
+     * @param {*} global
+     */
+    Impulsus.exports = function (global) {
+        global.Impulsus = {
+            controller: this.controller
+        };
+    }
+
+    Impulsus.bind = function () {
+        this.bindSections();
+        this.bindControllers();
+    }
+
+    Impulsus.bindSections = function () {
+        var sections = Array.prototype.slice.call(document.querySelectorAll('section'));
+        sections.forEach(function (section) {
             if ('false' === section.dataset.impulsus) {
                 return;
             }
             if (section.dataset.src) {
                 Impulsus.load(section, section.dataset.src);
             }
-            var links = section.querySelectorAll('a');
-            links.forEach(function(link) {
-                link.addEventListener('click', function(event) {
+            var links = Array.prototype.slice.call(section.querySelectorAll('a'));
+            links.forEach(function (link) {
+                link.addEventListener('click', /** @param {Event} event */ function (event) {
                     var target = null;
                     if (link.dataset.target) {
                         const dataTarget = '' + link.dataset.target;
@@ -34,12 +52,104 @@
             });
         });
     }
-    
+
+    Impulsus.bindControllers = function () {
+        var controllers = Array.prototype.slice.call(document.querySelectorAll('[data-controller]'));
+        controllers.forEach(function (controller) {
+            var controllerName = controller.getAttribute('data-controller');
+            var script = document.createElement('script');
+            script.setAttribute('src', 'controllers/' + controllerName + '.js');
+            script.setAttribute('data-name', controllerName);
+            var head = document.querySelector('head');
+            if (null === head) {
+                head = document.body;
+            }
+            head.appendChild(script);
+        });
+    }
+
+    /**
+     * Create a new Impulsus controller
+     * @param {function} init
+     */
+    Impulsus.controller = function (init) {
+        var controllerName = document.currentScript ? document.currentScript.getAttribute('data-name') : 'controller';
+        var el = document.querySelector('[data-controller="' + controllerName + '"]');
+        if (null === el) {
+            return;
+        }
+
+        var targets = Array.prototype.slice.call(el.querySelectorAll('[data-' + controllerName + '-target]'));
+        /** @type {Object<string, ImpulsusControllerTarget>} */
+        var targetNames = {};
+        targets.forEach(/** @param {HTMLElement} target */ function (target) {
+            var targetName = target.getAttribute('data-' + controllerName + '-target');
+            if (null == targetName) {
+                return;
+            }
+            targetNames[targetName] = {
+                set: /** @param {*} value */ function (value) {
+                    if ('input' === target.nodeName.toLowerCase()) {
+                        /** @type {*} */
+                        var input = target;
+                        input.value = value;
+                    } else {
+                        target.innerText = value;
+                    }
+                    var ev = new Event('change');
+                    target.dispatchEvent(ev);
+                },
+                get: function () {
+                    if ('input' === target.nodeName.toLowerCase()) {
+                        /** @type {*} */
+                        var input = target;
+                        return input.value;
+                    }
+                    return target.innerText;
+                }
+            };
+        });
+
+        /** @type {Object<string, Function>} */
+        var events = {};
+        var controller = {
+            name: controllerName,
+            targets: targetNames,
+            on:
+                /**
+                 * @param {string} event
+                 * @param {Function} callback
+                 **/
+                function (event, callback) {
+                    events[event] = callback;
+                }
+        };
+
+
+        var actions = Array.prototype.slice.call(el.querySelectorAll('[data-action]'));
+        actions.forEach(function (action) {
+            var parts = action.getAttribute('data-action').split('#');
+            var event = parts.pop();
+            parts = new String(parts.pop()).split('->');
+            var listener = new String(parts.shift());
+            if (0 === listener.length) {
+                listener = 'click';
+            }
+            action.addEventListener(listener, function () {
+                if (event in events) {
+                    events[event]();
+                }
+            });
+        });
+
+        init(controller);
+    }
+
     /**
      * @param {string} target
      * @return {Element|null}
      */
-    Impulsus.resolveTarget = function(target) {
+    Impulsus.resolveTarget = function (target) {
         var el = null;
         if (0 !== target.indexOf('_')) {
             el = document.querySelector(target);
@@ -48,21 +158,21 @@
                 el = document.body;
             }
         }
-                
+
         return el;
     }
-    
+
     /**
      * 
      * @param {Element} section 
      * @param {string} url 
      */
-    Impulsus.load = function(section, url) {
+    Impulsus.load = function (section, url) {
         section.setAttribute('data-loading', 'true');
         var dataDelay = section.getAttribute('data-delay');
         var delay = dataDelay ? parseInt(dataDelay) : 0;
-        setTimeout(function() {
-            Impulsus.xhr(url, function(r) {
+        setTimeout(function () {
+            Impulsus.xhr(url, /** @param {string} r */ function (r) {
                 var div = document.createElement('div');
                 div.innerHTML = r;
                 var result = null;
@@ -84,16 +194,16 @@
             });
         }, delay);
     }
-    
+
     /**
      * Load file using XHR
      * @param {string} url 
-     * @param {function(string): void} callback
+     * @param {Function} callback
      * @return {void}
      */
-    Impulsus.xhr = function(url, callback) {
+    Impulsus.xhr = function (url, callback) {
         var xhr = new XMLHttpRequest();
-        xhr.addEventListener('readystatechange', function() {
+        xhr.addEventListener('readystatechange', function () {
             if (4 === this.readyState && 200 === this.status) {
                 callback(this.responseText);
             }
@@ -108,9 +218,9 @@
         xhr.open('GET', url);
         xhr.send();
     }
-    
-    window.addEventListener('load', function() {
-        Impulsus.init();
+
+    window.addEventListener('load', function () {
+        Impulsus.init(window);
     });
-    
+
 })();

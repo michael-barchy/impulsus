@@ -73,3 +73,41 @@ Dynamically loaded sections can be loaded from full content, section or section 
 <section id="below">
 </section>
 ```
+
+### Controllers
+
+A controller is a javascript function loaded at runtime that connects to an HTML element (aka container) to dynamically update targets inside the controller's container and listen to actions (events).
+
+```html
+<div data-controller="counter">
+    <button type="button" data-action="click->counter#increment">Click here to increment counter</button>
+    <p>You clicked <span data-counter-target="counter">0</span> times</p>
+</div>
+```
+
+```js
+// controllers/counter.js
+
+/** @type {ImpulsusWindow} */
+var global = window;
+(
+    /** 
+    * @external Impulsus
+    * @param {Impulsus} [impulsus] 
+    */
+    function (impulsus) {
+        if (impulsus) {
+            impulsus.controller(/** @param {ImpulsusController} controller */ function (controller) {
+                controller.on('increment', function() {
+                    var counter = controller.targets['counter'].get();
+                    if (0 === counter.length) {
+                        counter = '0';
+                    }
+                    controller.targets['counter'].set(parseInt(counter) + 1);
+                });
+            });
+        }
+    }
+)(global.Impulsus);
+```
+
