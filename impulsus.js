@@ -8,6 +8,33 @@
      */
     Impulsus.init = function (global) {
         this.exports(global);
+        
+        var h = location.hash.substring(1);
+        var parts = h.split('=');
+        if (2 === parts.length) {
+            var section = document.querySelector('#' + parts[0]);
+            if (null === section) {
+                return;
+            }
+            Impulsus.load(section, parts[1], function() {
+                if (null === section) {
+                    return;
+                }
+                Impulsus.bind(section);
+            });
+        }
+        
+        window.addEventListener('popstate', function (event) {
+            if (event.state) {
+                if ('target' in event.state && 'html' in event.state) {
+                    var el = document.querySelector('#' + event.state.target);
+                    if (null !== el) {
+                        el.innerHTML = event.state.html;
+                    }
+                }
+            }
+        });
+        
         this.bind();
     };
 
@@ -20,13 +47,22 @@
         };
     }
 
-    Impulsus.bind = function () {
-        this.bindSections();
-        this.bindControllers();
+    /**
+     * @param {Element} [root]
+     */
+    Impulsus.bind = function (root) {
+        this.bindSections(root);
+        this.bindControllers(root);
     }
 
-    Impulsus.bindSections = function () {
-        var sections = Array.prototype.slice.call(document.querySelectorAll('section'));
+    /**
+     * @param {Element|Document} [root]
+     */
+    Impulsus.bindSections = function (root) {
+        if (undefined === root) {
+            root = document;
+        }
+        var sections = Array.prototype.slice.call(root.querySelectorAll('section'));
         sections.forEach(function (section) {
             if ('false' === section.dataset.impulsus) {
                 return;
@@ -34,27 +70,58 @@
             if (section.dataset.src) {
                 Impulsus.load(section, section.dataset.src);
             }
-            var links = Array.prototype.slice.call(section.querySelectorAll('a'));
-            links.forEach(function (link) {
-                link.addEventListener('click', /** @param {Event} event */ function (event) {
-                    var target = null;
-                    if (link.dataset.target) {
-                        const dataTarget = '' + link.dataset.target;
-                        target = Impulsus.resolveTarget(dataTarget);
+            Impulsus.bindLinks(section);
+        });
+    }
+
+    /**
+     * @param {Element} section 
+     */
+    Impulsus.bindLinks = function (section) {
+        var links = Array.prototype.slice.call(section.querySelectorAll('a'));
+        links.forEach(function (link) {
+            link.addEventListener('click', /** @param {Event} event */ function (event) {
+                var target = null;
+                if (link.dataset.target) {
+                    const dataTarget = '' + link.dataset.target;
+                    target = Impulsus.resolveTarget(dataTarget);
+                }
+                if (null === target) {
+                    target = section;
+                }
+                if (!target.hasAttribute('id')) {
+                    target.setAttribute('id', 'section-' + new Date().getTime());
+                }
+                if (link.hasAttribute('data-navigate')) {
+                    history.replaceState({
+                        target: target.getAttribute('id'),
+                        html: target.innerHTML
+                    }, '', location.href);
+                }
+                Impulsus.load(target, link.href, /** @param {Element} target */ function (target) {
+                    Impulsus.bind(target);
+                    if (link.hasAttribute('data-navigate')) {
+                        var href = link.href.replace(location.href, '');
+                        history.pushState({
+                            target: target.getAttribute('id'),
+                            html: target.innerHTML
+                        }, '', '#' + target.getAttribute('id') + '=' + href);
                     }
-                    if (null === target) {
-                        target = section;
-                    }
-                    Impulsus.load(target, link.href);
-                    event.preventDefault();
-                    event.stopPropagation();
                 });
+                event.preventDefault();
+                event.stopPropagation();
             });
         });
     }
 
-    Impulsus.bindControllers = function () {
-        var controllers = Array.prototype.slice.call(document.querySelectorAll('[data-controller]'));
+    /**
+     * @param {Element|Document} [root]
+     */
+    Impulsus.bindControllers = function (root) {
+        if (undefined === root) {
+            root = document;
+        }
+        var controllers = Array.prototype.slice.call(root.querySelectorAll('[data-controller]'));
         controllers.forEach(function (controller) {
             var controllerName = controller.getAttribute('data-controller');
             var script = document.createElement('script');
@@ -163,11 +230,11 @@
     }
 
     /**
-     * 
      * @param {Element} section 
      * @param {string} url 
+     * @param {Function} [callback]
      */
-    Impulsus.load = function (section, url) {
+    Impulsus.load = function (section, url, callback) {
         section.setAttribute('data-loading', 'true');
         var dataDelay = section.getAttribute('data-delay');
         var delay = dataDelay ? parseInt(dataDelay) : 0;
@@ -190,6 +257,9 @@
                 section.removeAttribute('data-delay');
                 if (!section.hasAttribute('data-src')) {
                     section.setAttribute('data-src', url);
+                }
+                if (callback) {
+                    callback(section);
                 }
             });
         }, delay);

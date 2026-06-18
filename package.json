@@ -1,6 +1,8 @@
 {
     "name": "impulsus",
     "files": [
-        "impulsus.js"
+        "impulsus.js",
+        "jsconfig.json",
+        "types.js"
     ]
 }
