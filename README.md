@@ -86,7 +86,7 @@ A controller is a javascript function loaded at runtime that connects to an HTML
 ```
 
 ```js
-// controllers/counter.js
+// controllers/counter.controller.js
 
 /**
  * @external ImpulsusWindow

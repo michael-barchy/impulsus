@@ -64,7 +64,7 @@
         }
         var sections = Array.prototype.slice.call(root.querySelectorAll('section'));
         sections.forEach(function (section) {
-            if ('false' === section.dataset.impulsus) {
+            if ('false' === section.getAttribute('data-impulsus')) {
                 return;
             }
             if (section.dataset.src) {
@@ -101,7 +101,13 @@
                 Impulsus.load(target, link.href, /** @param {Element} target */ function (target) {
                     Impulsus.bind(target);
                     if (link.hasAttribute('data-navigate')) {
-                        var href = link.href.replace(location.href, '');
+                        var root = location.href;
+                        if (!root.endsWith('/')) {
+                            var parts = root.split('/');
+                            parts.pop();
+                            root = parts.join('/') + '/';
+                        }
+                        var href = link.href.replace(root, '');
                         history.pushState({
                             target: target.getAttribute('id'),
                             html: target.innerHTML
@@ -125,7 +131,7 @@
         controllers.forEach(function (controller) {
             var controllerName = controller.getAttribute('data-controller');
             var script = document.createElement('script');
-            script.setAttribute('src', 'controllers/' + controllerName + '.js');
+            script.setAttribute('src', 'controllers/' + controllerName + '.controller.js');
             script.setAttribute('data-name', controllerName);
             var head = document.querySelector('head');
             if (null === head) {

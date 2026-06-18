@@ -3,6 +3,10 @@
     "files": [
         "impulsus.js",
         "jsconfig.json",
+        "postinstall.js",
         "types.js"
-    ]
+    ],
+    "scripts": {
+        "postinstall": "node postinstall.js"
+    }
 }
