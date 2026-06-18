@@ -21,7 +21,8 @@
                 link.addEventListener('click', function(event) {
                     var target = null;
                     if (link.dataset.target) {
-                        target = document.querySelector(link.dataset.target);
+                        const dataTarget = '' + link.dataset.target;
+                        target = Impulsus.resolveTarget(dataTarget);
                     }
                     if (null === target) {
                         target = section;
@@ -32,6 +33,23 @@
                 });
             });
         });
+    }
+    
+    /**
+     * @param {string} target
+     * @return {Element|null}
+     */
+    Impulsus.resolveTarget = function(target) {
+        var el = null;
+        if (0 !== target.indexOf('_')) {
+            el = document.querySelector(target);
+        } else {
+            if ('_top' === target) {
+                el = document.body;
+            }
+        }
+                
+        return el;
     }
     
     /**
@@ -71,7 +89,7 @@
      * Load file using XHR
      * @param {string} url 
      * @param {function(string): void} callback
-     * @return void
+     * @return {void}
      */
     Impulsus.xhr = function(url, callback) {
         var xhr = new XMLHttpRequest();
