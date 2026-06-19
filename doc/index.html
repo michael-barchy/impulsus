@@ -1,11 +1,19 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <title>Impulsus | Documentation</title>
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
-    <link rel="icon" type="image/x-icon" href="../favicon.ico">
-    <link rel="icon" type="image/png" href="../impulsus.png"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <base href="../">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="impulsus.png" />
+    <script type="text/javascript">
+        if (-1 !== navigator.userAgent.indexOf('Trident') && -1 !== navigator.userAgent.indexOf('rv:11')) {
+            document.write('<link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">');
+        }
+    </script>
     <style content="text/css">
         :root {
             --bulma-primary-h: 281deg;
@@ -23,8 +31,8 @@
             margin-bottom: 1em;
         }
     </style>
-    <link rel="stylesheet"
-        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <link rel="stylesheet" href="ie11.css">
+    <link rel="stylesheet" href="https://unpkg.com/line-awesome@1.3.0/dist/line-awesome/css/line-awesome.min.css">
     <script type="text/javascript" src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/default.min.css">
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
@@ -32,16 +40,17 @@
     <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
     <script type="text/javascript">
-        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+        if (hljs) {
+            hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+        }
     </script>
-    <script type="text/javascript" src="../impulsus.js"></script>
-    <base href="../">
+    <script type="text/javascript" src="impulsus.js"></script>
 </head>
 
 <body data-controller="wiki">
     <div class="container is-fluid px-0">
         <section id="menu" data-src="../menu.html"></section>
-        <section class="hero">
+        <section class="hero mt-5">
             <div class="hero-body">
                 <div class="columns">
                     <div class="column">

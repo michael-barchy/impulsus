@@ -1,26 +1,33 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <title>Impulsus | Documentation</title>
-    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="icon" type="image/png" href="./impulsus.png"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="impulsus.png" />
+    <script type="text/javascript">
+        if (-1 !== navigator.userAgent.indexOf('Trident') && -1 !== navigator.userAgent.indexOf('rv:11')) {
+            document.write('<link rel="stylesheet" href="https://unpkg.com/bulma@0.9.4/css/bulma.min.css">');
+        } else {
+            document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">');
+        }
+    </script>
     <style content="text/css">
         :root {
             --bulma-primary-h: 281deg;
             --bulma-primary-l: 72%;
         }
     </style>
-    <link rel="stylesheet"
-        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <link rel="stylesheet" href="ie11.css">
+    <link rel="stylesheet" href="https://unpkg.com/line-awesome@1.3.0/dist/line-awesome/css/line-awesome.min.css">
     <script type="text/javascript" src="impulsus.js"></script>
 </head>
 
 <body>
     <div class="container is-fluid px-0">
         <section id="menu" data-src="menu.html"></section>
-        <section class="hero">
+        <section class="hero mt-5">
             <div class="hero-body">
                 <p class="title">Impulsus</p>
                 <p class="subtitle">Vanilla JavaScript library to implement Dynamic Sections (aka Turbo Frames)

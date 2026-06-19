@@ -4,7 +4,22 @@
     }
 
     /**
-     * @param {*} global 
+     * @param {string} event
+     * @param {*} [params]
+     * @returns {*}
+     */
+    Impulsus.customEvent = function (event, params) {
+        if ('function' === typeof window.CustomEvent) return new window.CustomEvent(event, params);
+
+        params = params || { bubbles: false, cancelable: false, detail: undefined };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+
+        return evt;
+    }
+
+    /**
+     * @param {*} global
      */
     Impulsus.init = function (global) {
         this.exports(global);
@@ -21,7 +36,7 @@
 
                         setTimeout(function () {
                             if (null !== el) {
-                                var event = new CustomEvent('impulsus:load');
+                                var event = Impulsus.customEvent('impulsus:load');
                                 el.dispatchEvent(event);
                             }
                         }, 100);
@@ -87,7 +102,7 @@
     }
 
     /**
-     * @param {Element} section 
+     * @param {Element} section
      */
     Impulsus.bindLinks = function (section) {
         var links = Array.prototype.slice.call(section.querySelectorAll('a'));
@@ -115,7 +130,7 @@
                     Impulsus.bind(target);
                     if (link.hasAttribute('data-navigate')) {
                         var root = location.href.replace(location.hash, '');
-                        if (!root.endsWith('/')) {
+                        if (root.lastIndexOf('/') !== root.length - 1) {
                             var parts = root.split('/');
                             parts.pop();
                             root = parts.join('/') + '/';
@@ -226,7 +241,7 @@
         var actions = Array.prototype.slice.call(el.querySelectorAll('[data-action]'));
         actions.forEach(function (action) {
             var actionList = action.getAttribute('data-action').trim().split(' ');
-            actionList.forEach(/** @param {string} actionItem */ function(actionItem) {
+            actionList.forEach(/** @param {string} actionItem */ function (actionItem) {
                 var parts = actionItem.split('#');
                 var event = new String(parts.pop()).toString();
                 parts = new String(parts.pop()).split('->');
@@ -263,8 +278,8 @@
     }
 
     /**
-     * @param {Element} section 
-     * @param {string} url 
+     * @param {Element} section
+     * @param {string} url
      * @param {Function} [callback]
      */
     Impulsus.load = function (section, url, callback) {
@@ -272,9 +287,9 @@
         var dataDelay = section.getAttribute('data-delay');
         var delay = dataDelay ? parseInt(dataDelay) : 0;
         setTimeout(function () {
-            var event = new CustomEvent('impulsus:before-load');
+            var event = Impulsus.customEvent('impulsus:before-load');
             section.dispatchEvent(event);
-            
+
             Impulsus.xhr(url, /** @param {string} r */ function (r) {
                 var div = document.createElement('div');
                 div.innerHTML = r;
@@ -301,7 +316,7 @@
                 }
 
                 setTimeout(function () {
-                    var event = new CustomEvent('impulsus:load');
+                    var event = Impulsus.customEvent('impulsus:load');
                     section.dispatchEvent(event);
                 }, 100);
             });
@@ -310,7 +325,7 @@
 
     /**
      * Load file using XHR
-     * @param {string} url 
+     * @param {string} url
      * @param {Function} callback
      * @return {void}
      */
@@ -321,12 +336,11 @@
                 callback(this.responseText);
             }
         });
-        if (!url.startsWith('http:') && !url.startsWith('https:') && !url.startsWith('/')) {
-            var href = new URL(location.href);
-            var path = href.pathname.split('/');
+        if (0 !== url.indexOf('http:') && 0 !== url.indexOf('https:') && 0 !== url.indexOf('/')) {
+            var href = new String(location.pathname);
+            var path = href.split('/');
             path.pop();
-            href.pathname = path.join('/') + '/' + url;
-            url = href.toString();
+            url = path.join('/') + '/' + url;
         }
         xhr.open('GET', url);
         xhr.send();

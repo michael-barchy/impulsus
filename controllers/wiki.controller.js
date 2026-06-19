@@ -7,8 +7,8 @@
 /** @type {ImpulsusWindow} */
 var w = window;
 (
-    /** 
-    * @param {Impulsus} [impulsus] 
+    /**
+    * @param {Impulsus} [impulsus]
     */
     function (impulsus) {
         if (impulsus) {
@@ -17,7 +17,7 @@ var w = window;
                     var wiki = controller.targets['wiki'];
                     wiki.classList.add('is-hidden');
                 });
-                
+
                 controller.on('menu', function () {
                     var menu = controller.targets['menu'];
                     var src = new String(menu.attr('data-src'));
@@ -43,7 +43,7 @@ var w = window;
                     });
                     html += '</ul></aside>';
                     menu.set(html);
-                    
+
                     setTimeout(function() {
                         menu.classList.remove('is-hidden');
                     }, 100);
@@ -52,7 +52,7 @@ var w = window;
                 controller.on('page', function () {
                     var wiki = controller.targets['wiki'];
                     var src = wiki.attr('data-src');
-                    
+
                     var prevMenuItem = document.querySelector('[data-target="#page"].is-active');
                     if (prevMenuItem) {
                         prevMenuItem.classList.remove('is-active');
