@@ -115,7 +115,7 @@
                 Impulsus.load(target, link.href, /** @param {Element} target */ function (target) {
                     Impulsus.bind(target);
                     if (link.hasAttribute('data-navigate')) {
-                        var root = location.href;
+                        var root = location.href.replace(location.hash, '');
                         if (!root.endsWith('/')) {
                             var parts = root.split('/');
                             parts.pop();
@@ -126,7 +126,7 @@
                             target: target.getAttribute('id'),
                             src: href,
                             html: target.innerHTML
-                        }, '', '#' + target.getAttribute('id') + '=' + href);
+                        }, '', root + '#' + target.getAttribute('id') + '=' + href);
                     }
                 });
                 event.preventDefault();
@@ -288,6 +288,7 @@
                 section.removeAttribute('data-loading');
                 section.removeAttribute('data-delay');
                 section.setAttribute('data-src', url);
+                section.setAttribute('data-result', r);
 
                 if (callback) {
                     callback(section);
