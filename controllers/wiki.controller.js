@@ -13,6 +13,11 @@ var w = window;
     function (impulsus) {
         if (impulsus) {
             impulsus.controller(/** @param {ImpulsusController} controller */ function (controller) {
+                controller.on('beforeLoad', function() {
+                    var wiki = controller.targets['wiki'];
+                    wiki.classList.add('is-hidden');
+                });
+                
                 controller.on('menu', function () {
                     var menu = controller.targets['menu'];
                     var src = new String(menu.attr('data-src'));
@@ -27,7 +32,7 @@ var w = window;
                     }
                     var html = '';
                     html += '<aside class="menu"><ul class="menu-list"><p class="menu-label">Documentation</p>';
-                    links.forEach(function (link, index) {
+                    links.forEach(function (link) {
                         var label = new String(link.match(/\[.*\]/));
                         var url = new String(link.match(/\(.*\)/));
                         label = label.replace(/\[(.*)\]/, '$1');
@@ -38,6 +43,10 @@ var w = window;
                     });
                     html += '</ul></aside>';
                     menu.set(html);
+                    
+                    setTimeout(function() {
+                        menu.classList.remove('is-hidden');
+                    }, 100);
                 });
 
                 controller.on('page', function () {
@@ -82,6 +91,7 @@ var w = window;
                             h.classList.add('title');
                             h.classList.add('is-' + level);
                         });
+                        wiki.classList.remove('is-hidden');
                     }, 100);
                 });
             });

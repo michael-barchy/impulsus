@@ -31,14 +31,14 @@
             <div class="hero-body">
                 <div class="columns">
                     <div class="column is-one-quarter">
-                        <section data-wiki-target="menu"
+                        <section id="toc" data-wiki-target="menu" class="is-hidden"
                             data-src="https://raw.githubusercontent.com/wiki/michael-barchy/impulsus/Home.md"
                             data-action="impulsus:load->#menu">
                         </section>
                     </div>
                     <div class="column">
                         <p class="title">Impulsus</p>
-                        <section id="page" data-wiki-target="wiki" data-action="impulsus:load->#page" data-delay="200"
+                        <section id="page" class="is-hidden" data-wiki-target="wiki" data-action="impulsus:before-load->#beforeLoad impulsus:load->#page" data-delay="200"
                             data-src="https://raw.githubusercontent.com/wiki/michael-barchy/impulsus/Install.md">
                         </section>
                     </div>

@@ -14,7 +14,6 @@
                 if ('target' in event.state && 'html' in event.state) {
                     var el = document.querySelector('#' + event.state.target);
                     if (null !== el) {
-                        console.debug(event.state);
                         el.innerHTML = event.state.html;
                         el.setAttribute('data-src', event.state.src);
                         Impulsus.bindLinks(el);
@@ -176,6 +175,7 @@
                 return;
             }
             targetNames[targetName] = {
+                classList: target.classList,
                 set: /** @param {*} value */ function (value) {
                     if ('input' === target.nodeName.toLowerCase()) {
                         /** @type {*} */
@@ -225,17 +225,20 @@
 
         var actions = Array.prototype.slice.call(el.querySelectorAll('[data-action]'));
         actions.forEach(function (action) {
-            var parts = action.getAttribute('data-action').split('#');
-            var event = parts.pop();
-            parts = new String(parts.pop()).split('->');
-            var listener = new String(parts.shift());
-            if (0 === listener.length) {
-                listener = 'click';
-            }
-            action.addEventListener(listener, function () {
-                if (event in events) {
-                    events[event]();
+            var actionList = action.getAttribute('data-action').trim().split(' ');
+            actionList.forEach(/** @param {string} actionItem */ function(actionItem) {
+                var parts = actionItem.split('#');
+                var event = new String(parts.pop()).toString();
+                parts = new String(parts.pop()).split('->');
+                var listener = new String(parts.shift());
+                if (0 === listener.length) {
+                    listener = 'click';
                 }
+                action.addEventListener(listener, function () {
+                    if (event in events) {
+                        events[event]();
+                    }
+                });
             });
         });
 
@@ -269,6 +272,9 @@
         var dataDelay = section.getAttribute('data-delay');
         var delay = dataDelay ? parseInt(dataDelay) : 0;
         setTimeout(function () {
+            var event = new CustomEvent('impulsus:before-load');
+            section.dispatchEvent(event);
+            
             Impulsus.xhr(url, /** @param {string} r */ function (r) {
                 var div = document.createElement('div');
                 div.innerHTML = r;

@@ -21,4 +21,5 @@
  * @property {Function} set
  * @property {Function} get
  * @property {Function} attr
+ * @property {DOMTokenList} classList
  */
