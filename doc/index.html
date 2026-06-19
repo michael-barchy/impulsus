@@ -20,6 +20,11 @@
     <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/default.min.css">
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/shell.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css" />
+    <script type="text/javascript">
+        hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
+    </script>
     <script type="text/javascript" src="../impulsus.js"></script>
     <base href="../">
 </head>
@@ -30,15 +35,16 @@
         <section class="hero">
             <div class="hero-body">
                 <div class="columns">
-                    <div class="column is-one-quarter">
+                    <div class="column">
                         <section id="toc" data-wiki-target="menu" class="is-hidden"
                             data-src="https://raw.githubusercontent.com/wiki/michael-barchy/impulsus/Home.md"
                             data-action="impulsus:load->#menu">
                         </section>
                     </div>
-                    <div class="column">
+                    <div class="column is-three-quarters">
                         <p class="title">Impulsus</p>
-                        <section id="page" class="is-hidden" data-wiki-target="wiki" data-action="impulsus:before-load->#beforeLoad impulsus:load->#page" data-delay="200"
+                        <section id="page" class="is-full is-hidden" data-wiki-target="wiki"
+                            data-action="impulsus:before-load->#beforeLoad impulsus:load->#page" data-delay="200"
                             data-src="https://raw.githubusercontent.com/wiki/michael-barchy/impulsus/Install.md">
                         </section>
                     </div>
