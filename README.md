@@ -95,7 +95,7 @@ A controller is a javascript function loaded at runtime that connects to an HTML
  */
 
 /** @type {ImpulsusWindow} */
-var global = window;
+var w = window;
 (
     /** 
     * @param {Impulsus} [impulsus] 
@@ -113,6 +113,6 @@ var global = window;
             });
         }
     }
-)(global.Impulsus);
+)(w.Impulsus);
 ```
 

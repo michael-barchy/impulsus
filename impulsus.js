@@ -8,7 +8,29 @@
      */
     Impulsus.init = function (global) {
         this.exports(global);
-        
+
+        window.addEventListener('popstate', function (event) {
+            if (event.state) {
+                if ('target' in event.state && 'html' in event.state) {
+                    var el = document.querySelector('#' + event.state.target);
+                    if (null !== el) {
+                        console.debug(event.state);
+                        el.innerHTML = event.state.html;
+                        el.setAttribute('data-src', event.state.src);
+                        Impulsus.bindLinks(el);
+                        Impulsus.bindControllers(el);
+
+                        setTimeout(function () {
+                            if (null !== el) {
+                                var event = new CustomEvent('impulsus:load');
+                                el.dispatchEvent(event);
+                            }
+                        }, 100);
+                    }
+                }
+            }
+        });
+
         var h = location.hash.substring(1);
         var parts = h.split('=');
         if (2 === parts.length) {
@@ -16,25 +38,16 @@
             if (null === section) {
                 return;
             }
-            Impulsus.load(section, parts[1], function() {
+            Impulsus.load(section, parts[1], function () {
                 if (null === section) {
                     return;
                 }
                 Impulsus.bind(section);
+                Impulsus.bind();
             });
+            return;
         }
-        
-        window.addEventListener('popstate', function (event) {
-            if (event.state) {
-                if ('target' in event.state && 'html' in event.state) {
-                    var el = document.querySelector('#' + event.state.target);
-                    if (null !== el) {
-                        el.innerHTML = event.state.html;
-                    }
-                }
-            }
-        });
-        
+
         this.bind();
     };
 
@@ -95,6 +108,7 @@
                 if (link.hasAttribute('data-navigate')) {
                     history.replaceState({
                         target: target.getAttribute('id'),
+                        src: target.getAttribute('data-src'),
                         html: target.innerHTML
                     }, '', location.href);
                 }
@@ -110,6 +124,7 @@
                         var href = link.href.replace(root, '');
                         history.pushState({
                             target: target.getAttribute('id'),
+                            src: href,
                             html: target.innerHTML
                         }, '', '#' + target.getAttribute('id') + '=' + href);
                     }
@@ -167,8 +182,14 @@
                         var input = target;
                         input.value = value;
                     } else {
-                        target.innerText = value;
+                        target.innerHTML = value;
                     }
+
+                    if ('section' === target.nodeName.toLowerCase()) {
+                        Impulsus.bindLinks(target);
+                        Impulsus.bindControllers(target);
+                    }
+
                     var ev = new Event('change');
                     target.dispatchEvent(ev);
                 },
@@ -178,7 +199,10 @@
                         var input = target;
                         return input.value;
                     }
-                    return target.innerText;
+                    return target.innerHTML;
+                },
+                attr: /** @param {string} name */ function (name) {
+                    return target.getAttribute(name);
                 }
             };
         });
@@ -249,6 +273,7 @@
                 var div = document.createElement('div');
                 div.innerHTML = r;
                 var result = null;
+
                 if (section.id) {
                     result = div.querySelector('section#' + section.id);
                 }
@@ -258,15 +283,20 @@
                 if (null === result) {
                     result = div;
                 }
+
                 section.innerHTML = result.innerHTML;
                 section.removeAttribute('data-loading');
                 section.removeAttribute('data-delay');
-                if (!section.hasAttribute('data-src')) {
-                    section.setAttribute('data-src', url);
-                }
+                section.setAttribute('data-src', url);
+
                 if (callback) {
                     callback(section);
                 }
+
+                setTimeout(function () {
+                    var event = new CustomEvent('impulsus:load');
+                    section.dispatchEvent(event);
+                }, 100);
             });
         }, delay);
     }

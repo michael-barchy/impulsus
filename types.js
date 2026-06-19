@@ -20,4 +20,5 @@
  * @typedef ImpulsusControllerTarget
  * @property {Function} set
  * @property {Function} get
+ * @property {Function} attr
  */
