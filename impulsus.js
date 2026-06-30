@@ -45,6 +45,33 @@
             }
         });
 
+        var root = document.querySelector(':root');
+        var observer = new MutationObserver(function (mutations) {
+            Array.prototype.slice.call(mutations).forEach(function (mutation) {
+                if ('data-controller' === mutation.attributeName || 'data-model' === mutation.attributeName) {
+                    Impulsus.bindControllers();
+                }
+
+                if ('data-action' === mutation.attributeName) {
+                    var parent = root;
+                    if (null === root) {
+                        parent = mutation.target.parentNode;
+                    }
+                    if (null !== parent) {
+                        Impulsus.bindLinks(parent);
+                    }
+                }
+            });
+        });
+
+        if (null !== root) {
+            observer.observe(root, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+            });
+        }
+
         var h = location.hash.substring(1);
         var parts = h.split('=');
         if (2 === parts.length) {
@@ -63,6 +90,8 @@
         }
 
         this.bind();
+        var event = this.customEvent('impulsus:ready');
+        window.dispatchEvent(event);
     };
 
     /**
@@ -70,6 +99,7 @@
      */
     Impulsus.exports = function (global) {
         global.Impulsus = {
+            xhr: this.xhr,
             controller: this.controller
         };
     }
@@ -159,9 +189,24 @@
         var controllers = Array.prototype.slice.call(root.querySelectorAll('[data-controller]'));
         controllers.forEach(function (controller) {
             var controllerName = controller.getAttribute('data-controller');
-            var script = document.createElement('script');
+            var script = document.querySelector('script[data-name="' + controllerName + '"]');
+            if (null !== script && !script.hasAttribute('src') && !script.hasAttribute('data-bind')) {
+                var event = Impulsus.customEvent('impulsus:controller', {
+                    detail: {
+                        controller: controllerName
+                    }
+                });
+                window.dispatchEvent(event);
+                script.setAttribute('data-bind', 'true');
+                script.innerHTML = '';
+            }
+            if (null !== script && script.hasAttribute('data-bind')) {
+                return;
+            }
+            script = document.createElement('script');
             script.setAttribute('src', 'controllers/' + controllerName + '.controller.js');
             script.setAttribute('data-name', controllerName);
+            script.setAttribute('data-bind', 'true');
             var head = document.querySelector('head');
             if (null === head) {
                 head = document.body;
@@ -173,52 +218,79 @@
     /**
      * Create a new Impulsus controller
      * @param {function} init
+     * @param {CustomEvent} [event]
      */
-    Impulsus.controller = function (init) {
-        var controllerName = document.currentScript ? document.currentScript.getAttribute('data-name') : 'controller';
+    Impulsus.controller = function (init, event) {
+        var eventControllerName = event ? event.detail.controller : null;
+        var scriptControllerName = document.currentScript ? document.currentScript.getAttribute('data-name') : 'controller';
+        var controllerName = eventControllerName ? eventControllerName : scriptControllerName;
         var el = document.querySelector('[data-controller="' + controllerName + '"]');
         if (null === el) {
             return;
         }
 
-        var targets = Array.prototype.slice.call(el.querySelectorAll('[data-' + controllerName + '-target]'));
+        var targetControllerName = new String(controllerName).replace(/[^a-z0-9]/g, '-');
+        var targets = Array.prototype.slice.call(el.querySelectorAll('[data-' + targetControllerName + '-target]'));
         /** @type {Object<string, ImpulsusControllerTarget>} */
         var targetNames = {};
         targets.forEach(/** @param {HTMLElement} target */ function (target) {
-            var targetName = target.getAttribute('data-' + controllerName + '-target');
+            var targetName = target.getAttribute('data-' + targetControllerName + '-target');
             if (null == targetName) {
                 return;
             }
             targetNames[targetName] = {
                 classList: target.classList,
-                set: /** @param {*} value */ function (value) {
-                    if ('input' === target.nodeName.toLowerCase()) {
-                        /** @type {*} */
-                        var input = target;
-                        input.value = value;
-                    } else {
-                        target.innerHTML = value;
-                    }
+                set:
+                    /**
+                     * @param {string} value
+                     * @return {void}
+                     **/
+                    function (value) {
+                        if ('input' === target.nodeName.toLowerCase()) {
+                            /** @type {*} */
+                            var input = target;
+                            input.value = value;
+                        } else {
+                            target.innerHTML = value;
+                        }
 
-                    if ('section' === target.nodeName.toLowerCase()) {
-                        Impulsus.bindLinks(target);
-                        Impulsus.bindControllers(target);
-                    }
+                        if ('section' === target.nodeName.toLowerCase()) {
+                            Impulsus.bindLinks(target);
+                            Impulsus.bindControllers(target);
+                        }
 
-                    var ev = new Event('change');
-                    target.dispatchEvent(ev);
-                },
-                get: function () {
-                    if ('input' === target.nodeName.toLowerCase()) {
-                        /** @type {*} */
-                        var input = target;
-                        return input.value;
+                        var ev = new Event('change');
+                        target.dispatchEvent(ev);
+                    },
+                get:
+                    /**
+                     * @return {string}
+                     */
+                    function () {
+                        if ('input' === target.nodeName.toLowerCase()) {
+                            /** @type {*} */
+                            var input = target;
+                            return input.value;
+                        }
+                        return target.innerHTML;
+                    },
+                attr:
+                    /**
+                     * @param {string} name
+                     * @param {string|null} [value]
+                     * @return {string|null}
+                     */
+                    function (name, value) {
+                        if (undefined !== value) {
+                            if (null === value) {
+                                target.removeAttribute(name);
+                            } else {
+                                target.setAttribute(name, value);
+                            }
+                        }
+
+                        return target.getAttribute(name);
                     }
-                    return target.innerHTML;
-                },
-                attr: /** @param {string} name */ function (name) {
-                    return target.getAttribute(name);
-                }
             };
         });
 
@@ -327,9 +399,12 @@
      * Load file using XHR
      * @param {string} url
      * @param {Function} callback
+     * @param {string} [method]
+     * @param {?string} [data]
+     * @param {string} [dataType]
      * @return {void}
      */
-    Impulsus.xhr = function (url, callback) {
+    Impulsus.xhr = function (url, callback, method, data, dataType) {
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('readystatechange', function () {
             if (4 === this.readyState && 200 === this.status) {
@@ -342,8 +417,18 @@
             path.pop();
             url = path.join('/') + '/' + url;
         }
-        xhr.open('GET', url);
-        xhr.send();
+        if ('GET' === method && data) {
+            if (-1 === url.indexOf('?')) {
+                url += '?';
+            }
+            url += '&' + data;
+            data = null;
+        }
+        xhr.open(method || 'GET', url);
+        if (dataType) {
+            xhr.setRequestHeader('Content-Type', dataType);
+        }
+        xhr.send(data || null);
     }
 
     window.addEventListener('load', function () {
