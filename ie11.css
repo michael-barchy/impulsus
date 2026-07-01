@@ -1,10 +1,13 @@
 @media all and (-ms-high-contrast: none),
 (-ms-high-contrast: active) {
-    .navbar.is-primary, .menu .menu-list a.is-active {
+
+    .navbar.is-primary,
+    .menu .menu-list a.is-active {
         background-color: #d270ff !important;
     }
 
-    .navbar.is-primary .navbar-item:hover, .navbar.is-primary .navbar-item.is-active {
+    .navbar.is-primary .navbar-item:hover,
+    .navbar.is-primary .navbar-item.is-active {
         background-color: #9152ae !important;
     }
 

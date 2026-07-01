@@ -23,6 +23,12 @@ git submodule add https://github.com/michael-barchy/impulsus
 git submodule update --remote
 ```
 
+### Using CDN
+
+```html
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/michael-barchy/impulsus@main/impulsus.js"></script>
+```
+
 ## Documentation
 
 * [Wiki](https://github.com/michael-barchy/impulsus/wiki)

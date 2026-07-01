@@ -1,30 +1,37 @@
-<nav class="navbar is-primary is-fixed-top" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="https://michael-barchy.github.io/impulsus">
+<style content="text/css">
+@media screen and (max-width: 768px) {
+    .button:has(span.is-hidden-mobile) {
+        padding-right: .25rem !important;
+    }
+}
+</style>
+<nav class="navbar is-primary is-fixed-top is-flex" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand pr-2">
+        <a class="navbar-item p-0 pr-2" href="https://michael-barchy.github.io/impulsus">
             <img src="impulsus.png" height="100%">
-            <strong>Impulsus</strong>
+            <strong class="is-hidden-mobile">Impulsus</strong>
         </a>
     </div>
 
-    <div class="navbar-menu is-active">
-        <div class="navbar-start">
-            <a href="./" class="navbar-item">
+    <div class="navbar-menu is-active is-shadowless is-flex is-flex-grow-1 is-align-items-stretch p-0">
+        <div class="navbar-start is-flex is-flex is-flex-grow-1">
+            <a href="./" class="navbar-item is-flex is-align-items-center">
                 Home
             </a>
 
-            <a href="doc/" class="navbar-item">
+            <a href="doc/" class="navbar-item is-flex is-align-items-center">
                 Documentation
             </a>
         </div>
 
-        <div class="navbar-end">
+        <div class="navbar-end is-flex">
             <div class="navbar-item">
                 <div class="buttons">
                     <a href="https://github.com/michael-barchy/impulsus" target="_blank" class="button is-light">
                         <span class="icon">
                             <i class="la la-github"></i>
                         </span>
-                        <span>Github</span>
+                        <span class="is-hidden-mobile">Github</span>
                     </a>
                 </div>
             </div>
