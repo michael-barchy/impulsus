@@ -78,6 +78,8 @@ var w = window;
                     }
                     wiki.set(html);
 
+                    wiki.classList.add('content');
+
                     /** @type {*} */
                     var h = 'hljs' in window ? window.hljs : null;
                     if (null !== h) {

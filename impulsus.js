@@ -45,7 +45,7 @@
             }
         });
 
-        var root = document.querySelector(':root');
+        var root = document.querySelector('html');
         var observer = new MutationObserver(function (mutations) {
             Array.prototype.slice.call(mutations).forEach(function (mutation) {
                 if ('data-controller' === mutation.attributeName || 'data-model' === mutation.attributeName) {
