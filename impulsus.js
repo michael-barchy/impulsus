@@ -249,7 +249,16 @@
                         if ('input' === target.nodeName.toLowerCase()) {
                             /** @type {*} */
                             var input = target;
-                            input.value = value;
+                            if ('checkbox' === target.getAttribute('type')) {
+                                input.checked = parseInt(input.value) === parseInt(value);
+                                if (input.checked) {
+                                    target.setAttribute('checked', 'true');
+                                } else {
+                                    target.removeAttribute('checked');
+                                }
+                            } else {
+                                input.value = value;
+                            }
                         } else {
                             target.innerHTML = value;
                         }
@@ -270,7 +279,11 @@
                         if ('input' === target.nodeName.toLowerCase()) {
                             /** @type {*} */
                             var input = target;
-                            return input.value;
+                            if ('checkbox' === target.getAttribute('type')) {
+                                return target.hasAttribute('checked') ? input.value : '0';
+                            } else {
+                                return input.value;
+                            }
                         }
                         return target.innerHTML;
                     },
@@ -310,7 +323,7 @@
         };
 
 
-        var actions = Array.prototype.slice.call(el.querySelectorAll('[data-action]'));
+        var actions = Array.prototype.slice.call(el.querySelectorAll('[data-action*="->' + controllerName + '#"]'));
         actions.forEach(function (action) {
             var actionList = action.getAttribute('data-action').trim().split(' ');
             actionList.forEach(/** @param {string} actionItem */ function (actionItem) {
@@ -321,9 +334,12 @@
                 if (0 === listener.length) {
                     listener = 'click';
                 }
-                action.addEventListener(listener, function () {
+                action.addEventListener(listener, /** @param {CustomEvent} e */ function (e) {
                     if (event in events) {
-                        events[event]();
+                        var param = action.getAttribute('data-param-' + event);
+                        events[event](param);
+                        e.preventDefault();
+                        e.stopPropagation();
                     }
                 });
             });
