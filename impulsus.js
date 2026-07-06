@@ -148,6 +148,10 @@
     Impulsus.bindLinks = function (section) {
         var links = Array.prototype.slice.call(section.querySelectorAll('a'));
         links.forEach(function (link) {
+            if ('false' === link.getAttribute('data-impulsus')) {
+                return;
+            }
+
             link.addEventListener('click', /** @param {Event} event */ function (event) {
                 var target = null;
                 if (link.dataset.target) {
