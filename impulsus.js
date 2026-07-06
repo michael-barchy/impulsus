@@ -393,7 +393,16 @@
             var event = Impulsus.customEvent('impulsus:before-load');
             section.dispatchEvent(event);
 
-            Impulsus.xhr(url, /** @param {string} r */ function (r) {
+            var dataXhr = document.querySelector('[data-xhr]');
+            var xhrFunc = null;
+            try {
+                var f = dataXhr ? dataXhr.getAttribute('data-xhr') : null;
+                xhrFunc = dataXhr && f ? eval(f) : Impulsus.xhr;
+            } catch {
+                xhrFunc = Impulsus.xhr;
+            }
+
+            xhrFunc(url, /** @param {string} r */ function (r) {
                 var div = document.createElement('div');
                 div.innerHTML = r;
                 var result = null;
