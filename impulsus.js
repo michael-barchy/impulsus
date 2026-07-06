@@ -98,10 +98,21 @@
      * @param {*} global
      */
     Impulsus.exports = function (global) {
+        var dataXhr = document.querySelector('[data-xhr]');
+        var xhrFunc = null;
+        try {
+            var f = dataXhr ? dataXhr.getAttribute('data-xhr') : null;
+            xhrFunc = dataXhr && f ? eval(f) : null;
+        } catch {
+            xhrFunc = null;
+        }
         global.Impulsus = {
-            xhr: this.xhr,
+            xhr: xhrFunc ? xhrFunc : this.xhr,
             controller: this.controller
         };
+        if (xhrFunc) {
+            global.Impulsus._xhr = this.xhr;
+        }
     }
 
     /**
