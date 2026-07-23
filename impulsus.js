@@ -243,20 +243,41 @@
      * @param {string|null} targetControllerName
      */
     Impulsus.target = function(target, targetName, targetControllerName) {
-        /** @type {Object<string, ImpulsusControllerTarget>} */
         var subTargetNames = {};
+        var refreshSubTargets =
+        /**
+         * @param {string} targetName
+         * @param {string} targetControllerName
+         * @return {Object<string, ImpulsusControllerTarget>}
+         */
+       function(targetName, targetControllerName) {
+            /** @type {Object<string, ImpulsusControllerTarget>} */
+            var subTargetNames = {};
+            if (null !== targetName && null !== targetControllerName) {
+                var subTargets = Array.prototype.slice.call(document.querySelectorAll('[data-' + targetControllerName + '-target-' + targetName + ']'));
+                subTargets.forEach(/** @param {HTMLElement} subTarget */ function (subTarget) {
+                    var subTargetName = subTarget.getAttribute('data-' + targetControllerName + '-target-' + targetName);
+                    if (null == subTargetName) {
+                        return;
+                    }
+                    subTargetNames[subTargetName] = Impulsus.target(subTarget, null, null);
+                });
+            }
+
+            return subTargetNames;
+        }
         if (null !== targetName && null !== targetControllerName) {
-            var subTargets = Array.prototype.slice.call(document.querySelectorAll('[data-' + targetControllerName + '-target-' + targetName + ']'));
-            subTargets.forEach(/** @param {HTMLElement} subTarget */ function (subTarget) {
-                var subTargetName = subTarget.getAttribute('data-' + targetControllerName + '-target-' + targetName);
-                if (null == subTargetName) {
-                    return;
-                }
-                subTargetNames[subTargetName] = Impulsus.target(subTarget, null, null);
-            });
+            subTargetNames = refreshSubTargets(targetName, targetControllerName);
         }
         return {
             classList: target.classList,
+            refreshTargets: function() {
+                var subTargetNames = {};
+                if (null !== targetName && null !== targetControllerName) {
+                    subTargetNames = refreshSubTargets(targetName, targetControllerName);
+                }
+                this.targets = 0 === Object.keys(subTargetNames).length ? null : subTargetNames
+            },
             targets: 0 === Object.keys(subTargetNames).length ? null : subTargetNames,
             set:
                 /**
