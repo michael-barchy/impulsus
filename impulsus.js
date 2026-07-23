@@ -285,6 +285,10 @@
                  * @return {void}
                  **/
                 function (value) {
+                    if (Array.isArray(value) || 'object' === typeof value) {
+                        return;
+                    }
+
                     if ('input' === target.nodeName.toLowerCase()) {
                         /** @type {*} */
                         var input = target;
@@ -351,8 +355,15 @@
                     if (null !== this.targets && !Array.isArray(values) && 'object' !== typeof values) {
                         return;
                     }
+                    var merged = Array.prototype.slice.call(document.querySelectorAll('[data-' + targetControllerName + '-merged]'));
+                    merged.forEach(function(el) {
+                        el.remove(); // @todo - update instead of remove
+                    });
+                    target.setAttribute('data-' + targetControllerName + '-temp', new String(target.getAttribute('data-' + targetControllerName + '-target')).toString());
                     target.removeAttribute('data-' + targetControllerName + '-target');
-                    target.setAttribute('data-' + targetControllerName + '-temp', 'true');
+                    target.style.display = target.hasAttribute('data-display') ? String(target.getAttribute('data-display')).toString() : target.style.display;
+                    target.removeAttribute('data-display');
+                    var actions = Array.prototype.slice.call(target.querySelectorAll('[data-action]'));
                     for (var key in values) {
                         var node = target.cloneNode(true);
                         if (null !== target.parentNode) {
@@ -361,9 +372,25 @@
                         var el = document.querySelector('[data-' + targetControllerName + '-temp]');
                         if (null !== el) {
                             el.removeAttribute('data-' + targetControllerName + '-temp');
+                            el.removeAttribute('data-model');
+                            el.setAttribute('data-' + targetControllerName + '-merged', key);
                         }
+                        actions.forEach(function (action) {
+                            if ('events' in action && null !== el) {
+                                var copy = el.querySelector('[data-action="' + action.getAttribute('data-action') + '"]');
+                                for (var listener in action.events) {
+                                    action.events[listener].forEach(/** @param {EventListenerOrEventListenerObject} callback */ function(callback) {
+                                        if (null === copy) {
+                                            return;
+                                        }
+                                        copy.addEventListener(listener, callback);
+                                    });
+                                }
+                            }
+                        });
                         for (var sub in this.targets) {
-                            var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll('[data-' + targetControllerName + '-target-' + targetName + '="' + sub + '"]'));
+                            var selector = '[data-' + targetControllerName + '-target-' + targetName + '="' + sub + '"]';
+                            var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                             subTargets.forEach(function (subTarget) {
                                 subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                                 subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
@@ -384,7 +411,10 @@
                             });
                         }
                     }
-                    target.remove();
+                    target.setAttribute('data-' + targetControllerName + '-target', new String(target.getAttribute('data-' + targetControllerName + '-temp')).toString());
+                    target.removeAttribute('data-' + targetControllerName + '-temp');
+                    target.setAttribute('data-display', target.style.display);
+                    target.style.display = 'none';
                 }
         };
     }
@@ -438,18 +468,30 @@
                 var parts = actionItem.split('#');
                 var event = new String(parts.pop()).toString();
                 parts = new String(parts.pop()).split('->');
-                var listener = new String(parts.shift());
+                var listener = new String(parts.shift()).toLowerCase();
                 if (0 === listener.length) {
                     listener = 'click';
                 }
-                action.addEventListener(listener, /** @param {CustomEvent} e */ function (e) {
+                if (!('events' in action)) {
+                    action.events = {};
+                }
+                if (!(listener in action.events)) {
+                    action.events[listener] = new Array();
+                }
+                var callback = /** @param {CustomEvent} e */ function (e) {
                     if (event in events) {
-                        var param = action.getAttribute('data-param-' + event);
+                        var target = null !== e.target ? e.target : action;
+                        while (!target.hasAttribute('data-action') && target.parentNode) {
+                            target = target.parentNode;
+                        }
+                        var param = target.getAttribute('data-param-' + event);
                         events[event](param);
                         e.preventDefault();
                         e.stopPropagation();
                     }
-                });
+                };
+                action.events[listener].push(callback);
+                action.addEventListener(listener, callback);
                 if ('render' === listener.toLowerCase()) {
                     setTimeout(function() {
                         var e = Impulsus.customEvent('render');
