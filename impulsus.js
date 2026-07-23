@@ -281,7 +281,7 @@
             targets: 0 === Object.keys(subTargetNames).length ? null : subTargetNames,
             set:
                 /**
-                 * @param {string} value
+                 * @param {string|number|boolean} value
                  * @return {void}
                  **/
                 function (value) {
@@ -289,7 +289,7 @@
                         /** @type {*} */
                         var input = target;
                         if ('checkbox' === target.getAttribute('type')) {
-                            input.checked = parseInt(input.value) === parseInt(value);
+                            input.checked = parseInt(input.value) === parseInt('' + value) || true === value;
                             if (input.checked) {
                                 target.setAttribute('checked', 'true');
                             } else {
@@ -299,7 +299,7 @@
                             input.value = value;
                         }
                     } else {
-                        target.innerHTML = value;
+                        target.innerHTML = '' + value;
                     }
 
                     if ('section' === target.nodeName.toLowerCase()) {
@@ -450,6 +450,12 @@
                         e.stopPropagation();
                     }
                 });
+                if ('render' === listener.toLowerCase()) {
+                    setTimeout(function() {
+                        var e = Impulsus.customEvent('render');
+                        action.dispatchEvent(e);
+                    }, 100);
+                }
             });
         });
 
