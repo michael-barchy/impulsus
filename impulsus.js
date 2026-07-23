@@ -237,6 +237,138 @@
     }
 
     /**
+     * Create a new Impulsus target
+     * @param {HTMLElement} target
+     * @param {string|null} targetName
+     * @param {string|null} targetControllerName
+     */
+    Impulsus.target = function(target, targetName, targetControllerName) {
+        /** @type {Object<string, ImpulsusControllerTarget>} */
+        var subTargetNames = {};
+        if (null !== targetName && null !== targetControllerName) {
+            var subTargets = Array.prototype.slice.call(document.querySelectorAll('[data-' + targetControllerName + '-target-' + targetName + ']'));
+            subTargets.forEach(/** @param {HTMLElement} subTarget */ function (subTarget) {
+                var subTargetName = subTarget.getAttribute('data-' + targetControllerName + '-target-' + targetName);
+                if (null == subTargetName) {
+                    return;
+                }
+                subTargetNames[subTargetName] = Impulsus.target(subTarget, null, null);
+            });
+        }
+        return {
+            classList: target.classList,
+            targets: 0 === Object.keys(subTargetNames).length ? null : subTargetNames,
+            set:
+                /**
+                 * @param {string} value
+                 * @return {void}
+                 **/
+                function (value) {
+                    if ('input' === target.nodeName.toLowerCase()) {
+                        /** @type {*} */
+                        var input = target;
+                        if ('checkbox' === target.getAttribute('type')) {
+                            input.checked = parseInt(input.value) === parseInt(value);
+                            if (input.checked) {
+                                target.setAttribute('checked', 'true');
+                            } else {
+                                target.removeAttribute('checked');
+                            }
+                        } else {
+                            input.value = value;
+                        }
+                    } else {
+                        target.innerHTML = value;
+                    }
+
+                    if ('section' === target.nodeName.toLowerCase()) {
+                        Impulsus.bindLinks(target);
+                        Impulsus.bindControllers(target);
+                    }
+
+                    var ev = new Event('change');
+                    target.dispatchEvent(ev);
+                },
+            get:
+                /**
+                 * @return {string}
+                 */
+                function () {
+                    if ('input' === target.nodeName.toLowerCase()) {
+                        /** @type {*} */
+                        var input = target;
+                        if ('checkbox' === target.getAttribute('type')) {
+                            return target.hasAttribute('checked') ? input.value : '0';
+                        } else {
+                            return input.value;
+                        }
+                    }
+                    return target.innerHTML;
+                },
+            attr:
+                /**
+                 * @param {string} name
+                 * @param {string|null} [value]
+                 * @return {string|null}
+                 */
+                function (name, value) {
+                    if (undefined !== value) {
+                        if (null === value) {
+                            target.removeAttribute(name);
+                        } else {
+                            target.setAttribute(name, value);
+                        }
+                    }
+
+                    return target.getAttribute(name);
+                },
+            merge:
+                /**
+                 * @param {unknown[]|Object<int|string, unknown>} values
+                 */
+                function(values) {
+                    if (null !== this.targets && !Array.isArray(values) && 'object' !== typeof values) {
+                        return;
+                    }
+                    target.removeAttribute('data-' + targetControllerName + '-target');
+                    target.setAttribute('data-' + targetControllerName + '-temp', 'true');
+                    for (var key in values) {
+                        var node = target.cloneNode(true);
+                        if (null !== target.parentNode) {
+                            target.parentNode.insertBefore(node, target);
+                        }
+                        var el = document.querySelector('[data-' + targetControllerName + '-temp]');
+                        if (null !== el) {
+                            el.removeAttribute('data-' + targetControllerName + '-temp');
+                        }
+                        for (var sub in this.targets) {
+                            var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll('[data-' + targetControllerName + '-target-' + targetName + '="' + sub + '"]'));
+                            subTargets.forEach(function (subTarget) {
+                                subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
+                                subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
+                                var value = values[key];
+                                if ('object' === typeof values[key] && sub in values[key]) {
+                                    value = values[key][sub];
+                                } else {
+                                    if ('$' === sub) {
+                                        value = key;
+                                    }
+                                }
+                                if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName)) {
+                                    var attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName);
+                                    Impulsus.target(subTarget, null, null).attr(attr, value);
+                                } else {
+                                    Impulsus.target(subTarget, null, null).set(value);
+                                }
+                            });
+                        }
+                    }
+                    target.remove();
+                }
+        };
+    }
+
+    /**
      * Create a new Impulsus controller
      * @param {function} init
      * @param {CustomEvent} [event]
@@ -259,73 +391,7 @@
             if (null == targetName) {
                 return;
             }
-            targetNames[targetName] = {
-                classList: target.classList,
-                set:
-                    /**
-                     * @param {string} value
-                     * @return {void}
-                     **/
-                    function (value) {
-                        if ('input' === target.nodeName.toLowerCase()) {
-                            /** @type {*} */
-                            var input = target;
-                            if ('checkbox' === target.getAttribute('type')) {
-                                input.checked = parseInt(input.value) === parseInt(value);
-                                if (input.checked) {
-                                    target.setAttribute('checked', 'true');
-                                } else {
-                                    target.removeAttribute('checked');
-                                }
-                            } else {
-                                input.value = value;
-                            }
-                        } else {
-                            target.innerHTML = value;
-                        }
-
-                        if ('section' === target.nodeName.toLowerCase()) {
-                            Impulsus.bindLinks(target);
-                            Impulsus.bindControllers(target);
-                        }
-
-                        var ev = new Event('change');
-                        target.dispatchEvent(ev);
-                    },
-                get:
-                    /**
-                     * @return {string}
-                     */
-                    function () {
-                        if ('input' === target.nodeName.toLowerCase()) {
-                            /** @type {*} */
-                            var input = target;
-                            if ('checkbox' === target.getAttribute('type')) {
-                                return target.hasAttribute('checked') ? input.value : '0';
-                            } else {
-                                return input.value;
-                            }
-                        }
-                        return target.innerHTML;
-                    },
-                attr:
-                    /**
-                     * @param {string} name
-                     * @param {string|null} [value]
-                     * @return {string|null}
-                     */
-                    function (name, value) {
-                        if (undefined !== value) {
-                            if (null === value) {
-                                target.removeAttribute(name);
-                            } else {
-                                target.setAttribute(name, value);
-                            }
-                        }
-
-                        return target.getAttribute(name);
-                    }
-            };
+            targetNames[targetName] = Impulsus.target(target, targetName, targetControllerName);
         });
 
         /** @type {Object<string, Function>} */
