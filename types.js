@@ -1,25 +1,34 @@
+/** @typedef {any} ImpulsusWindow */
 /**
- * Impulsus global used for exports
- * @typedef {*} ImpulsusWindow
- * @property {Impulsus} [Impulsus]
- */
-
-/**
- * Exposed Impulsus functions
  * @typedef {Object} Impulsus
- * @property {Function} controller
+ * @property {Function} init
+ * @property {Function} exports
+ * @property {Function} customEvent
+ * @property {Function} bind
+ * @property {Function} bindLinks
+ * @property {Function} bindControllers
+ * @property {Function} bindSections
+ * @property {any} [controller]
+ * @property {Function} target
+ * @property {Function} resolveTarget
+ * @property {Function} load
+ * @property {Function} [xhr]
  */
-
 /**
- * @typedef ImpulsusController
- * @property {Object<string, ImpulsusControllerTarget>} targets
+ * @typedef {Object} ImpulsusController
+ * @property {{ [key: string]: ImpulsusControllerTarget }} targets
  * @property {Function} on
  */
-
 /**
- * @typedef ImpulsusControllerTarget
+ * @typedef {Object} ImpulsusControllerTarget
  * @property {Function} set
  * @property {Function} get
  * @property {Function} attr
+ * @property {Function} merge
  * @property {DOMTokenList} classList
+ */
+/**
+ * @typedef {{
+ * 	events: { [key: string] : Function[] }
+ * } & Element} ImpulsusAction
  */

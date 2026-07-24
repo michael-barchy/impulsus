@@ -3,10 +3,19 @@
     "files": [
         "impulsus.js",
         "jsconfig.json",
-        "postinstall.js",
+        "postinstall.mjs",
         "types.js"
     ],
     "scripts": {
-        "postinstall": "node postinstall.js"
+        "build": "npx ts-to-jsdoc -f -o . src/types.ts && npx rollup -c rollup.types.config.js && npx rollup -c",
+        "postinstall": "node postinstall.mjs"
+    },
+    "type": "module",
+    "devDependencies": {
+        "@rollup/plugin-typescript": "^12.3.0",
+        "rollup": "^4.62.2",
+        "ts-to-jsdoc": "^2.4.0",
+        "tslib": "^2.8.1",
+        "typescript": "^6.0.3"
     }
 }

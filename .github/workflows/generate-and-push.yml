@@ -1,0 +1,41 @@
+name: Generate and Push File
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+
+    - name: Generate File
+      run: |
+        npm ci
+        npm run build
+
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@://github.com"
+
+        git add impulsus.js
+        git add types.js
+
+        if git diff --staged --quiet; then
+          echo "No update"
+        else
+          git commit -m "chore: build impulsus.js [skip ci]"
+          git push origin main
+        fi
