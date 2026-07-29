@@ -1,4 +1,4 @@
-import { ImpulsusAction, ImpulsusControllerTarget, Impulsus } from "./types";
+import { ImpulsusAction, ImpulsusControllerTarget, Impulsus } from './types';
 
 /**
  * @param {Function} init

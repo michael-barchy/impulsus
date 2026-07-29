@@ -1,4 +1,4 @@
-import { ImpulsusAction, ImpulsusController, ImpulsusControllerTarget, Impulsus } from "./types";
+import { ImpulsusAction, ImpulsusController, ImpulsusControllerTarget, Impulsus } from './types';
 
 /**
  * @param {HTMLElement} target

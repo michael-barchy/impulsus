@@ -1,4 +1,4 @@
-import { Impulsus } from "./types";
+import { Impulsus } from './types';
 
 /**
  * @param {Element|Document} [root]
