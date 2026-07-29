@@ -636,29 +636,29 @@
     }
 
     /** @type {Impulsus} */
-    var impulsus = {};
-    impulsus.init = init;
-    impulsus.exports = impulsusExports;
-    impulsus.customEvent = customEvent;
-    impulsus.bind = bind;
-    impulsus.bindLinks = bindLinks;
-    impulsus.bindControllers = bindControllers;
-    impulsus.bindSections = bindSections;
-    impulsus.controller =
+    var Impulsus = {};
+    Impulsus.init = init;
+    Impulsus.exports = impulsusExports;
+    Impulsus.customEvent = customEvent;
+    Impulsus.bind = bind;
+    Impulsus.bindLinks = bindLinks;
+    Impulsus.bindControllers = bindControllers;
+    Impulsus.bindSections = bindSections;
+    Impulsus.controller =
         /**
          * @param {Function} init
          * @param {CustomEvent} [event]
          * @this {Impulsus}
          */
         function (init, event) {
-            controller.bind(impulsus)(init, event);
+            controller.bind(Impulsus)(init, event);
         };
-    impulsus.target = target;
-    impulsus.resolveTarget = resolveTarget;
-    impulsus.load = load;
-    impulsus.xhr = xhr;
+    Impulsus.target = target;
+    Impulsus.resolveTarget = resolveTarget;
+    Impulsus.load = load;
+    Impulsus.xhr = xhr;
     window.addEventListener('load', function () {
-        impulsus.init(window);
+        Impulsus.init(window);
     });
 
 })();
