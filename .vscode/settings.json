@@ -1,4 +1,7 @@
 {
     "editor.useTabStops": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "gitPullOnOpen.enabled": true,
+    "gitPullOnOpen.continuousPull.enabled": true,
+    "gitPullOnOpen.continuousPull.interval": 30000
 }
