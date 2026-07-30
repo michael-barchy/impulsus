@@ -165,7 +165,7 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                         const selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         const subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget: Element) {
-                            const name = subTarget.getAttribute(selector);
+                            const name = subTarget.getAttribute('data-' + targetControllerName + '-target-' + targetName);
                             if (null === name) {
                                 return;
                             }
