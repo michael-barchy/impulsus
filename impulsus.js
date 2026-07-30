@@ -537,7 +537,11 @@
                                     }
                                 }
                             }
-                            if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName)) {
+                            if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + key)) {
+                                var attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + key);
+                                self.target(subTarget, null, null).attr(attr, value);
+                            }
+                            else if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName)) {
                                 var attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName);
                                 self.target(subTarget, null, null).attr(attr, value);
                             }
