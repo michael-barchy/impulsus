@@ -174,7 +174,7 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                                 return;
                             }
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
-                            subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
+                            subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, name);
                             let value = Array.isArray(values) ? values[parseInt(String(key))] : values[key as string];
                             if ('string' === typeof key && !Array.isArray(values)) {
                                 value = values[key];
