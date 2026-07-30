@@ -359,9 +359,13 @@
                         return;
                     }
                     var names = subTargetName.split(' ');
+                    var namesUnique = '';
                     names.forEach(function (name) {
-                        subTargetNames[name] = self.target(subTarget, null, null);
+                        var unique = new Date().getTime() + Math.floor((Math.random() * 8999) + 1000);
+                        namesUnique += ' ' + name + ':' + unique;
+                        subTargetNames[name + ':' + unique] = self.target(subTarget, null, null);
                     });
+                    subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName, namesUnique.trim());
                 });
             }
             return subTargetNames;
@@ -493,7 +497,8 @@
                             });
                         }
                     });
-                    Object.keys(controller.targets).forEach(function (sub) {
+                    Object.keys(controller.targets).forEach(function (subUnique) {
+                        var sub = String(subUnique.split(':').shift());
                         var selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget) {
@@ -502,10 +507,9 @@
                                 return;
                             }
                             var names = name.split(' ');
-                            if (-1 === names.indexOf(sub)) {
+                            if (-1 === names.indexOf(subUnique)) {
                                 return;
                             }
-                            subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, name);
                             var value = Array.isArray(values) ? values[parseInt(String(key))] : values[key];
                             if ('string' === typeof key && !Array.isArray(values)) {
