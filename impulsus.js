@@ -494,9 +494,17 @@
                         }
                     });
                     Object.keys(controller.targets).forEach(function (sub) {
-                        var selector = '[data-' + targetControllerName + '-target-' + targetName + '="' + sub + '"]';
+                        var selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget) {
+                            var name = subTarget.getAttribute(selector);
+                            if (null === name) {
+                                return;
+                            }
+                            var names = name.split(' ');
+                            if (-1 === names.indexOf(sub)) {
+                                return;
+                            }
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
                             var value = Array.isArray(values) ? values[parseInt(String(key))] : values[key];
