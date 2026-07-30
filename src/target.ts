@@ -27,9 +27,13 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                         return;
                     }
                     const names = subTargetName.split(' ');
+                    let namesUnique = '';
                     names.forEach((name) => {
-                        subTargetNames[name] = self.target(subTarget, null, null);
+                        const unique = new Date().getTime() + Math.floor((Math.random() * 8999) + 1000);
+                        namesUnique += ' ' + name + ':' + unique;
+                        subTargetNames[name + ':' + unique] = self.target(subTarget, null, null);
                     });
+                    subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName, namesUnique.trim());
                 });
             }
 
@@ -161,7 +165,8 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                             });
                         }
                     });
-                    Object.keys(controller.targets).forEach((sub) => {
+                    Object.keys(controller.targets).forEach((subUnique) => {
+                        const sub = String(subUnique.split(':').shift());
                         const selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         const subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget: Element) {
@@ -170,10 +175,9 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                                 return;
                             }
                             const names = name.split(' ');
-                            if (-1 === names.indexOf(sub)) {
+                            if (-1 === names.indexOf(subUnique)) {
                                 return;
                             }
-                            subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, name);
                             let value = Array.isArray(values) ? values[parseInt(String(key))] : values[key as string];
                             if ('string' === typeof key && !Array.isArray(values)) {
