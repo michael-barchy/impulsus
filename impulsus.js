@@ -497,7 +497,7 @@
                         var selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         var subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget) {
-                            var name = subTarget.getAttribute(selector);
+                            var name = subTarget.getAttribute('data-' + targetControllerName + '-target-' + targetName);
                             if (null === name) {
                                 return;
                             }
