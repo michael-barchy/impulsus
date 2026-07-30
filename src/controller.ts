@@ -21,11 +21,12 @@ export default function (init: Function, event: CustomEvent) {
     /** @type {{ [key: string]: ImpulsusControllerTarget }} */
     const targetNames: { [key: string]: ImpulsusControllerTarget } = {};
     targets.forEach(/** @param {HTMLElement} target */ function (target: HTMLElement) {
-        var targetName = target.getAttribute('data-' + targetControllerName + '-target');
+        const targetName = target.getAttribute('data-' + targetControllerName + '-target');
         if (null == targetName) {
             return;
         }
-        targetNames[targetName] = self.target(target, targetName, targetControllerName);
+        const names = targetName.split(' ');
+        names.forEach((name) => targetNames[name] = self.target(target, name, targetControllerName));
     });
 
     /** @type {{ [key: string] : Function }} */

@@ -14,9 +14,9 @@ export default function (target: HTMLElement, targetName: string | null, targetC
         /**
          * @param {string} targetName
          * @param {string} targetControllerName
-         * @return {Object<string, ImpulsusControllerTarget>}
+         * @return {{ [key: string]: ImpulsusControllerTarget }}
          */
-        function (targetName: string, targetControllerName: string) {
+        function (targetName: string, targetControllerName: string): { [key: string]: ImpulsusControllerTarget } {
             /** @type {{ [key: string]: ImpulsusControllerTarget }} */
             const subTargetNames: { [key: string]: ImpulsusControllerTarget } = {};
             if (null !== targetName && null !== targetControllerName) {
@@ -26,7 +26,10 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                     if (null == subTargetName) {
                         return;
                     }
-                    subTargetNames[subTargetName] = self.target(subTarget, null, null);
+                    const names = subTargetName.split(' ');
+                    names.forEach((name) => {
+                        subTargetNames[name] = self.target(subTarget, null, null);
+                    });
                 });
             }
 
