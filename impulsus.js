@@ -269,7 +269,8 @@
             if (null == targetName) {
                 return;
             }
-            targetNames[targetName] = self.target(target, targetName, targetControllerName);
+            var names = targetName.split(' ');
+            names.forEach(function (name) { return targetNames[name] = self.target(target, name, targetControllerName); });
         });
         /** @type {{ [key: string] : Function }} */
         var events = {};
@@ -345,7 +346,7 @@
         /**
          * @param {string} targetName
          * @param {string} targetControllerName
-         * @return {Object<string, ImpulsusControllerTarget>}
+         * @return {{ [key: string]: ImpulsusControllerTarget }}
          */
         function (targetName, targetControllerName) {
             /** @type {{ [key: string]: ImpulsusControllerTarget }} */
@@ -357,7 +358,10 @@
                     if (null == subTargetName) {
                         return;
                     }
-                    subTargetNames[subTargetName] = self.target(subTarget, null, null);
+                    var names = subTargetName.split(' ');
+                    names.forEach(function (name) {
+                        subTargetNames[name] = self.target(subTarget, null, null);
+                    });
                 });
             }
             return subTargetNames;
