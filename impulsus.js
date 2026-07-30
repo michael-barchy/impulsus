@@ -506,7 +506,7 @@
                                 return;
                             }
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
-                            subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
+                            subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, name);
                             var value = Array.isArray(values) ? values[parseInt(String(key))] : values[key];
                             if ('string' === typeof key && !Array.isArray(values)) {
                                 value = values[key];
