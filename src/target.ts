@@ -167,7 +167,7 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget: Element) {
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
-                            let value = Array.isArray(values) ? values[Number(key)] : values[key as string];
+                            let value = Array.isArray(values) ? values[parseInt(String(key))] : values[key as string];
                             if ('string' === typeof key && !Array.isArray(values)) {
                                 value = values[key];
                                 if (null !== value && 'object' === typeof value && sub in value) {
@@ -175,6 +175,17 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                                     const obj: { [key: string]: unknown } = value as unknown as { [key: string]: unknown };
                                     value = obj[sub];
                                 } else {
+                                    if ('$' === sub) {
+                                        value = key;
+                                    }
+                                }
+                            } else {
+                                if (null !== value && 'object' === typeof value && sub in value) {
+                                    /** @type {*} */
+                                    var obj: { [key: string]: unknown } = value as unknown as { [key: string]: unknown };
+                                    value = obj[sub];
+                                }
+                                else {
                                     if ('$' === sub) {
                                         value = key;
                                     }
