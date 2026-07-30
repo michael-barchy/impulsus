@@ -162,9 +162,17 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                         }
                     });
                     Object.keys(controller.targets).forEach((sub) => {
-                        const selector = '[data-' + targetControllerName + '-target-' + targetName + '="' + sub + '"]';
+                        const selector = '[data-' + targetControllerName + '-target-' + targetName + ']';
                         const subTargets = null === el ? new Array() : Array.prototype.slice.call(el.querySelectorAll(selector));
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget: Element) {
+                            const name = subTarget.getAttribute(selector);
+                            if (null === name) {
+                                return;
+                            }
+                            const names = name.split(' ');
+                            if (-1 === names.indexOf(sub)) {
+                                return;
+                            }
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
                             let value = Array.isArray(values) ? values[parseInt(String(key))] : values[key as string];
