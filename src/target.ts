@@ -203,8 +203,8 @@ export default function (target: HTMLElement, targetName: string | null, targetC
                                     }
                                 }
                             }
-                            if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + key)) {
-                                const attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + key);
+                            if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + sub)) {
+                                const attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName + '-' + sub);
                                 self.target(subTarget, null, null).attr(attr, value);
                             } else if (subTarget.hasAttribute('data-' + targetControllerName + '-attr-' + targetName)) {
                                 const attr = subTarget.getAttribute('data-' + targetControllerName + '-attr-' + targetName);
