@@ -499,9 +499,21 @@
                         subTargets.forEach(/** @param {Element} subTarget */ function (subTarget) {
                             subTarget.removeAttribute('data-' + targetControllerName + '-target-' + targetName);
                             subTarget.setAttribute('data-' + targetControllerName + '-target-' + targetName + '-' + key, sub);
-                            var value = Array.isArray(values) ? values[Number(key)] : values[key];
+                            var value = Array.isArray(values) ? values[parseInt(String(key))] : values[key];
                             if ('string' === typeof key && !Array.isArray(values)) {
                                 value = values[key];
+                                if (null !== value && 'object' === typeof value && sub in value) {
+                                    /** @type {*} */
+                                    var obj_1 = value;
+                                    value = obj_1[sub];
+                                }
+                                else {
+                                    if ('$' === sub) {
+                                        value = key;
+                                    }
+                                }
+                            }
+                            else {
                                 if (null !== value && 'object' === typeof value && sub in value) {
                                     /** @type {*} */
                                     var obj = value;
